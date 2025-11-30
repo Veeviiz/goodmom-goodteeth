@@ -1,16 +1,31 @@
 import React, { useState } from "react";
 import { questions } from "../assets/question";
+import { resultMap } from "../assets/result";
 import { BsEmojiDizzy, BsEmojiGrin, BsEmojiFrown } from "react-icons/bs";
-// ฟังก์ชันคำนวณคะแนนและความเสี่ยงแบบง่าย
-function calculateOralHealthScore(answers) {
-  const totalScore = answers.filter(Boolean).length; // นับ true = ใช่
-  let riskLevel = "Low";
-  if (totalScore >= 4) {
-    riskLevel = "High";
-  } else if (totalScore >= 2) {
-    riskLevel = "Moderate";
-  }
-  return { totalScore, riskLevel };
+
+function calculateFinalResults(answers) {
+  // answers = ["ใช่","ไม่ใช่", ...] index 0-9
+
+  const yesList = answers
+    .map((ans, index) => (ans === "ใช่" ? index + 1 : null))
+    .filter(Boolean);
+
+  // Case 7 → ไม่ใช่ทั้งหมด
+  if (yesList.length === 0) return [7];
+
+  // Case 6 → เฉพาะข้อ 1  2 เท่านั้น
+  const only1and2 =
+    yesList.length > 0 && yesList.every((id) => id === 1 || id === 2);
+
+  if (only1and2) return [6];
+
+  // Case อื่นๆ → ให้ผลของข้อ 3–10 ที่ตอบ "ใช่"
+  const resultList = yesList
+    .filter((id) => id >= 3) // ตัดข้อ 1–2 ออก
+    .map((id) => resultMap[id]?.id);
+
+  const uniqueResultsList = [...new Set(resultList)];
+  return uniqueResultsList;
 }
 
 const Quiz = () => {
@@ -39,9 +54,7 @@ const Quiz = () => {
   // const noCount = answers.filter((a) => !a).length;
 
   // คำนวณความเสี่ยงตอนจบ
-  const { riskLevel } = finished
-    ? calculateOralHealthScore(answers)
-    : { riskLevel: null };
+  const results = finished ? calculateFinalResults(answers) : null;
 
   return (
     <>
@@ -55,7 +68,7 @@ const Quiz = () => {
                     <div
                       key={i}
                       className={`w-6 h-6 rounded-full border-2 border-[#5a4631] ${
-                        i < index ? "bg-[#5a4631]" : "bg-white"
+                        i < index ? "bg-white" : "bg-white"
                       }`}
                     />
                   ))}
@@ -85,13 +98,13 @@ const Quiz = () => {
 
                 <div className="flex gap-4 justify-center mt-4">
                   <button
-                    onClick={() => handleAnswer(true)}
+                    onClick={() => handleAnswer("ใช่")}
                     className="bg-green-500 hover:bg-green-600 text-white px-6 py-2 rounded-lg"
                   >
                     ใช่
                   </button>
                   <button
-                    onClick={() => handleAnswer(false)}
+                    onClick={() => handleAnswer("ไม่ใช่")}
                     className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg"
                   >
                     ไม่ใช่
@@ -104,44 +117,72 @@ const Quiz = () => {
               </div>
             </div>
           ) : (
-            <div className="bg-[#5a4631] text-white p-6 rounded-xl text-center">
-              <h2 className="text-2xl font-semibold mb-4">สรุปการประเมิน</h2>
+            <div className="relative text-white p-4 rounded-xl text-center">
+              <div className="absolute top-5 left-1/2  -translate-x-1/2 flex gap-3">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-6 h-6 bg-white rounded-full border-2 border-[#5a4631]"
+                  ></div>
+                ))}
+              </div>
+
+              {/* ขดลวดอยู่บนขอบ */}
+              <div className="absolute top-1 left-1/2 -translate-x-1/2 flex gap-6">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div
+                    key={i}
+                    className="w-3 h-8 bg-[#5a4631] rounded-full"
+                  ></div>
+                ))}
+              </div>
+              <div className="bg-[#ffe680] rounded-xl shadow-lg p-6 text-center border-4 border-[#5a4631] flex flex-col justify-center">
+                <p className="text-2xl font-bold text-[#5a4631]">
+                  สรุปการประเมิน
+                </p>
+              </div>
+
               {/* <p className="mb-2">ใช่: {yesCount}</p>
               <p className="mb-2">ไม่ใช่: {noCount}</p> */}
-              <div className="bg-white w-full h-50 rounded-lg justify-center items-center">
-                {riskLevel === "Low" && (
-                  <div className="h-50 flex flex-col justify-center items-center bg-[#F6F1E8] rounded-lg">
-                    <div className="bg-green-100 p-8 rounded-full">
-                      <BsEmojiGrin size={50} color="green"></BsEmojiGrin>
-                    </div>
-                    <div className="text-green-500 mt-2 text-2xl">
-                      คุณมีความเสี่ยงต่ำ
-                    </div>
-                  </div>
-                )}
+              {results && (
+                <div className="">
+                  {/* ดึงผลลัพธ์แบบไม่ซ้ำ */}
+                  {[...new Set(results)].map((resultId, index) => {
+                    // หา object ใน resultMap ที่มี id ตรงกัน
+                    const resultObj = Object.values(resultMap).find(
+                      (r) => r.id === resultId
+                    );
+                    if (!resultObj) return null;
 
-                {riskLevel === "Moderate" && (
-                  <div className="h-50 flex flex-col justify-center items-center bg-[#F6F1E8] rounded-lg">
-                    <div className="bg-orange-100 p-8 rounded-full">
-                      <BsEmojiFrown size={50} color="orange"></BsEmojiFrown>
-                    </div>
-                    <div className="text-orange-500 mt-2 text-2xl">
-                      คุณมีความเสี่ยงปานกลาง
-                    </div>
-                  </div>
-                )}
+                    return (
+                      <div
+                        key={index}
+                        className=" p-4 bg-[#5a4631] rounded-2xl mt-3 whitespace-pre-line"
+                      >
+                        <div className="bg-[#ffe680] rounded-xl p-4">
+                          {" "}
+                          <p className="text-2xl text-[#5a4631] font-bold">
+                            {resultObj.message}
+                          </p>
+                        </div>
 
-                {riskLevel === "High" && (
-                  <div className="h-50 flex flex-col justify-center items-center bg-[#F6F1E8] rounded-lg">
-                    <div className="bg-red-100 p-8 rounded-full">
-                      <BsEmojiDizzy size={50} color="red"></BsEmojiDizzy>
-                    </div>
-                    <div className="text-red-500 mt-2 text-xl">
-                      คุณมีความเสี่ยงปานกลาง
-                    </div>
-                  </div>
-                )}
-              </div>
+                        <h1 className="text-[#f6f1e8] mt-2 font-bold">
+                          คำแนะนำ
+                        </h1>
+                        <p className="text-[#f6f1e8] text-left text-sm">
+                          <ul className="list-disc list-inside ">
+                            {resultObj.protect.split("\n").map((line, idx) => (
+                              <li key={idx} className="">
+                                {line.trim()}
+                              </li>
+                            ))}
+                          </ul>
+                        </p>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
 
               <div className="flex gap-3 justify-center mt-4 ">
                 <button
@@ -153,6 +194,15 @@ const Quiz = () => {
               </div>
             </div>
           )}
+          <div>
+            <h1 className="text-[#5a4631]">จัดทำโดย</h1>
+            <h1 className="text-[#5a4631]">
+              นักศึกษาทันตสาธารณสุข ชั้นปีที่ 4
+            </h1>
+            <h1 className="text-[#5a4631]">
+              วิทยาลัยการสาธารณสุขสิรินธร จังหวัดยะลา
+            </h1>
+          </div>
         </div>
       </div>
     </>
