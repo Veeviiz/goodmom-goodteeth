@@ -1,43 +1,18 @@
 import React, { useState } from "react";
 import { questions } from "../assets/question";
 import { resultMap } from "../assets/result";
+import { calculateFinalResults } from "../utils/quizUtils";
 import { BsEmojiDizzy, BsEmojiGrin, BsEmojiFrown } from "react-icons/bs";
-
-function calculateFinalResults(answers) {
-  // answers = ["ใช่","ไม่ใช่", ...] index 0-9
-
-  const yesList = answers
-    .map((ans, index) => (ans === "ใช่" ? index + 1 : null))
-    .filter(Boolean);
-
-  // Case 7 → ไม่ใช่ทั้งหมด
-  if (yesList.length === 0) return [7];
-
-  // Case 6 → เฉพาะข้อ 1  2 เท่านั้น
-  const only1and2 =
-    yesList.length > 0 && yesList.every((id) => id === 1 || id === 2);
-
-  if (only1and2) return [6];
-
-  // Case อื่นๆ → ให้ผลของข้อ 3–10 ที่ตอบ "ใช่"
-  const resultList = yesList
-    .filter((id) => id >= 3) // ตัดข้อ 1–2 ออก
-    .map((id) => resultMap[id]?.id);
-
-  const uniqueResultsList = [...new Set(resultList)];
-  return uniqueResultsList;
-}
+const getQuestionText = (q) => {
+  if (typeof q === "string") return q;
+  if (!q) return "";
+  return q.text ?? q.question ?? q.q ?? JSON.stringify(q);
+};
 
 const Quiz = () => {
   const [index, setIndex] = useState(0);
   const [answers, setAnswers] = useState([]);
   const finished = index >= (Array.isArray(questions) ? questions.length : 0);
-
-  const getQuestionText = (q) => {
-    if (typeof q === "string") return q;
-    if (!q) return "";
-    return q.text ?? q.question ?? q.q ?? JSON.stringify(q);
-  };
 
   const handleAnswer = (value) => {
     setAnswers((prev) => [...prev, value]);
@@ -171,6 +146,7 @@ const Quiz = () => {
                         </h1>
                         <p className="text-[#f6f1e8] text-left text-sm">
                           <ul className="list-disc list-inside ">
+                            {results.length === 0 && <li>ไม่พบผลลัพธ์</li>}
                             {resultObj.protect.split("\n").map((line, idx) => (
                               <li key={idx} className="">
                                 {line.trim()}
