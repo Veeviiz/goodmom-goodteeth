@@ -30,7 +30,7 @@ function calculateFinalResults(answers) {
 
 const Quiz = () => {
   const [index, setIndex] = useState(0);
-  const [answers, setAnswers] = useState([]); // true = ใช่, false = ไม่ใช่
+  const [answers, setAnswers] = useState([]);
   const finished = index >= (Array.isArray(questions) ? questions.length : 0);
 
   const getQuestionText = (q) => {
@@ -194,15 +194,18 @@ const Quiz = () => {
               </div>
             </div>
           )}
-          <div>
-            <h1 className="text-[#5a4631]">จัดทำโดย</h1>
-            <h1 className="text-[#5a4631]">
-              นักศึกษาทันตสาธารณสุข ชั้นปีที่ 4
-            </h1>
-            <h1 className="text-[#5a4631]">
-              วิทยาลัยการสาธารณสุขสิรินธร จังหวัดยะลา
-            </h1>
-          </div>
+
+          {results && (
+            <div>
+              <h1 className="text-[#5a4631]">จัดทำโดย</h1>
+              <h1 className="text-[#5a4631]">
+                นักศึกษาทันตสาธารณสุข ชั้นปีที่ 4
+              </h1>
+              <h1 className="text-[#5a4631]">
+                วิทยาลัยการสาธารณสุขสิรินธร จังหวัดยะลา
+              </h1>
+            </div>
+          )}
         </div>
       </div>
     </>
