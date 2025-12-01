@@ -1,8 +1,7 @@
 import React, { useState } from "react";
 import { questions } from "../assets/question";
-import { resultMap } from "../assets/result";
+import { resultDetails } from "../assets/result";
 import { calculateFinalResults } from "../utils/quizUtils";
-import { BsEmojiDizzy, BsEmojiGrin, BsEmojiFrown } from "react-icons/bs";
 const getQuestionText = (q) => {
   if (typeof q === "string") return q;
   if (!q) return "";
@@ -29,8 +28,10 @@ const Quiz = () => {
   // const noCount = answers.filter((a) => !a).length;
 
   // คำนวณความเสี่ยงตอนจบ
-  const results = finished ? calculateFinalResults(answers) : null;
+  const results = finished ? calculateFinalResults(answers) : [];
+  console.log(answers);
 
+  console.log(results);
   return (
     <>
       <div className="min-h-screen flex items-center justify-center p-8 font-display">
@@ -67,7 +68,7 @@ const Quiz = () => {
               </div>
 
               <div className="bg-[#ffe680] shadow-lg border-4 border-[#5a4631] rounded-xl shadow p-6 text-center w-80">
-                <p className="text-xl text-[#5a4631] mb-4">
+                <p className="text-xl text-[#5a4631] mb-4 font-bold">
                   {getQuestionText(questions[index])}
                 </p>
 
@@ -123,10 +124,7 @@ const Quiz = () => {
                 <div className="">
                   {/* ดึงผลลัพธ์แบบไม่ซ้ำ */}
                   {[...new Set(results)].map((resultId, index) => {
-                    // หา object ใน resultMap ที่มี id ตรงกัน
-                    const resultObj = Object.values(resultMap).find(
-                      (r) => r.id === resultId
-                    );
+                    const resultObj = resultDetails[resultId];
                     if (!resultObj) return null;
 
                     return (
@@ -144,16 +142,15 @@ const Quiz = () => {
                         <h1 className="text-[#f6f1e8] mt-2 font-bold">
                           คำแนะนำ
                         </h1>
-                        <p className="text-[#f6f1e8] text-left text-sm">
+                        <div className="text-[#f6f1e8] text-left text-sm">
                           <ul className="list-disc list-inside ">
-                            {results.length === 0 && <li>ไม่พบผลลัพธ์</li>}
                             {resultObj.protect.split("\n").map((line, idx) => (
                               <li key={idx} className="">
                                 {line.trim()}
                               </li>
                             ))}
                           </ul>
-                        </p>
+                        </div>
                       </div>
                     );
                   })}
@@ -168,18 +165,15 @@ const Quiz = () => {
                   ทำใหม่
                 </button>
               </div>
-            </div>
-          )}
-
-          {results && (
-            <div>
-              <h1 className="text-[#5a4631]">จัดทำโดย</h1>
-              <h1 className="text-[#5a4631]">
-                นักศึกษาทันตสาธารณสุข ชั้นปีที่ 4
-              </h1>
-              <h1 className="text-[#5a4631]">
-                วิทยาลัยการสาธารณสุขสิรินธร จังหวัดยะลา
-              </h1>
+              <div className="left-1/2 translate-x-1  translate-y-15 w-full mb-8">
+                <h1 className="text-[#5a4631]">จัดทำโดย</h1>
+                <h1 className="text-[#5a4631]">
+                  นักศึกษาทันตสาธารณสุข ชั้นปีที่ 4
+                </h1>
+                <h1 className="text-[#5a4631]">
+                  วิทยาลัยการสาธารณสุขสิรินธร จังหวัดยะลา
+                </h1>
+              </div>
             </div>
           )}
         </div>
