@@ -180,7 +180,7 @@ const Quiz = () => {
                 </div>
               )}
 
-              <div className="flex gap-3 justify-center mt-2 ">
+              <div className="flex gap-3 justify-center mt-6 ">
                 <button
                   onClick={() =>
                     window.open(
@@ -188,15 +188,15 @@ const Quiz = () => {
                       "_blank"
                     )
                   }
-                  className="bg-[#ffe680] text-[#5a4631] px-4 py-2 rounded-lg font-medium"
+                  className="bg-[#ffe680] text-[#5a4631] px-4 py-2 rounded-lg font-medium border-2"
                 >
-                  แบบสอบถาม
+                  แบบประเมินความพึ่งพอใจ
                 </button>
               </div>
               <div className="flex gap-3 justify-center mt-2 ">
                 <button
                   onClick={handleRestart}
-                  className="bg-[#ffe680] text-[#5a4631] px-4 py-2 rounded-lg font-medium"
+                  className=" text-[#5a4631] px-4 py-2 rounded-lg font-medium"
                 >
                   <MdOutlineReplay size={32} />
                 </button>
