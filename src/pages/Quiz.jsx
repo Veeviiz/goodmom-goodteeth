@@ -63,7 +63,6 @@ const Quiz = () => {
                 </div>
 
                 <div className="bg-[#ffe680] w-80 h-40 rounded-xl shadow-lg p-6 text-center border-4 border-[#5a4631] flex flex-col justify-center mx-auto">
-                  <p className="text-2xl font-medium text-[#5a4631]">คำถาม</p>
                   <p className="text-4xl font-bold text-[#5a4631]">{`คำถามที่ ${
                     index + 1
                   }`}</p>
