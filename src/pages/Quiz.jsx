@@ -2,6 +2,9 @@ import React, { useState } from "react";
 import { questions } from "../assets/question";
 import { resultDetails } from "../assets/result";
 import { calculateFinalResults } from "../utils/quizUtils";
+import { FaRegSmile, FaRegMeh } from "react-icons/fa";
+import { FaRegFaceFrown } from "react-icons/fa6";
+import { MdOutlineReplay } from "react-icons/md";
 const getQuestionText = (q) => {
   if (typeof q === "string") return q;
   if (!q) return "";
@@ -125,18 +128,38 @@ const Quiz = () => {
                   {/* ดึงผลลัพธ์แบบไม่ซ้ำ */}
                   {[...new Set(results)].map((resultId, index) => {
                     const resultObj = resultDetails[resultId];
+                    const riskConfig = {
+                      low: {
+                        textColor: "text-green-600",
+                        color: "bg-green-500",
+                        icon: <FaRegSmile size={56} />, // ความเสี่ยงต่ำ
+                      },
+                      medium: {
+                        textColor: "text-yellow-600",
+                        color: "bg-yellow-500",
+                        icon: <FaRegMeh size={56} />, // ความเสี่ยงปานกลาง
+                      },
+                      high: {
+                        textColor: "text-red-600",
+                        color: "bg-red-500",
+                        icon: <FaRegFaceFrown size={56} />, // ความเสี่ยงสูง
+                      },
+                    };
                     if (!resultObj) return null;
 
                     return (
                       <div
                         key={index}
-                        className=" p-4 bg-[#5a4631] rounded-2xl mt-3 whitespace-pre-line"
+                        className=" p-4 bg-[#5a4631] rounded-2xl mt-3 whitespace-pre-line "
                       >
-                        <div className="bg-[#ffe680] rounded-xl p-4">
-                          {" "}
-                          <p className="text-2xl text-[#5a4631] font-bold">
+                        <div
+                          className={`${riskConfig[resultId].color} rounded-xl p-4 flex flex-col items-center `}
+                        >
+                          {riskConfig[resultId].icon}
+
+                          <h2 className="text-2xl font-bold mt-1 ">
                             {resultObj.message}
-                          </p>
+                          </h2>
                         </div>
 
                         <h1 className="text-[#f6f1e8] mt-2 font-bold">
@@ -157,15 +180,28 @@ const Quiz = () => {
                 </div>
               )}
 
-              <div className="flex gap-3 justify-center mt-4 ">
+              <div className="flex gap-3 justify-center mt-2 ">
+                <button
+                  onClick={() =>
+                    window.open(
+                      "https://docs.google.com/forms/d/e/1FAIpQLSd12UTIiGvMC4mMvadvvq_BePUAjjvY5huNScYRC4SZbUneTg/viewform",
+                      "_blank"
+                    )
+                  }
+                  className="bg-[#ffe680] text-[#5a4631] px-4 py-2 rounded-lg font-medium"
+                >
+                  แบบสอบถาม
+                </button>
+              </div>
+              <div className="flex gap-3 justify-center mt-2 ">
                 <button
                   onClick={handleRestart}
                   className="bg-[#ffe680] text-[#5a4631] px-4 py-2 rounded-lg font-medium"
                 >
-                  ทำใหม่
+                  <MdOutlineReplay size={32} />
                 </button>
               </div>
-              <div className="left-1/2 translate-x-1  translate-y-15 w-full mb-8">
+              <div className="left-1/2 translate-x-1  translate-y-10 w-full ">
                 <h1 className="text-[#5a4631]">จัดทำโดย</h1>
                 <h1 className="text-[#5a4631]">
                   นักศึกษาทันตสาธารณสุข ชั้นปีที่ 4

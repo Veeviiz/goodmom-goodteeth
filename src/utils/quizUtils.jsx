@@ -1,5 +1,5 @@
 import { questions } from "../assets/question";
-import { questionToResultId } from "../assets/result";
+
 export function calculateFinalResults(answers = []) {
   const totalQuestions = Array.isArray(questions)
     ? questions.length
@@ -20,26 +20,31 @@ export function calculateFinalResults(answers = []) {
     if (isYes(norm[i])) yesList.push(i + 1); // 1-based question id
   }
 
-  // Case 7 → ไม่ใช่ทั้งหมด
-  if (yesList.length === 0) return [7];
+  // Count yes answers in question ranges
+  const yes1to6 = yesList.filter((id) => id >= 1 && id <= 6).length;
+  const yes7to10 = yesList.filter((id) => id >= 7 && id <= 10).length;
 
-  // Case 6 → เฉพาะข้อ 1 &/หรือ 2 เท่านั้น (ไม่มีข้ออื่น)
-  const only1and2 = yesList.every((id) => id === 1 || id === 2);
-  if (only1and2) return [6];
-
-  // อื่น ๆ → ให้ผลของข้อ 3–10 ที่ตอบ "ใช่"
-  const mapped = yesList
-    .filter((id) => id >= 3) // only questions 3..10 produce mapped results
-    .map((qId) => questionToResultId[qId])
-    .filter(Boolean);
-
-  // If mapping produced nothing (edge-case), fallback:
-  if (mapped.length === 0) {
-    // If there are yes answers but none in 3..10 (should have been handled by only1and2),
-    // return [6] as a safe fallback.
-    return [6];
+  // Rule: any "ใช่" in questions 7-10 => High risk
+  if (yes7to10 > 0) {
+    return ["high"];
   }
 
-  // unique result ids
-  return [...new Set(mapped)];
+  // No yes answers in 7-10
+  // Low risk: yes in 1-6 is 0-2
+  if (yes1to6 <= 2) {
+    return ["low"];
+  }
+
+  // Medium risk: yes in 1-6 is 3-5
+  if (yes1to6 >= 3 && yes1to6 <= 5) {
+    return ["medium"];
+  }
+
+  // High risk: yes in 1-6 is 6 (all of first six)
+  if (yes1to6 >= 6) {
+    return ["high"];
+  }
+
+  // Fallback to low
+  return ["low"];
 }
