@@ -189,7 +189,7 @@ const Quiz = () => {
                   }
                   className="bg-[#ffe680] text-[#5a4631] px-4 py-2 rounded-lg font-medium border-2"
                 >
-                  แบบประเมินความพึ่งพอใจ
+                  แบบประเมินความพึงพอใจ
                 </button>
               </div>
               <div className="flex gap-3 justify-center mt-2 ">
